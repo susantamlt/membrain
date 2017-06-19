@@ -450,157 +450,158 @@
           </div>
         </div>
       </div>
-       <script type="text/javascript">
-      jQuery(function() {
-            $.validator.addMethod("regex",function(value, element, regexp) {
-              if (regexp.constructor != RegExp)
-                regexp = new RegExp(regexp);
-              else if (regexp.global)
-                regexp.lastIndex = 0;
-              return this.optional(element) || regexp.test(value);
-            },"Please check your input.");
+      <script type="text/javascript">
+        jQuery(function() {
+          $.validator.addMethod("regex",function(value, element, regexp) {
+            if (regexp.constructor != RegExp)
+              regexp = new RegExp(regexp);
+            else if (regexp.global)
+              regexp.lastIndex = 0;
+            return this.optional(element) || regexp.test(value);
+          },"Please check your input.");
 
-            jQuery("form[name='campaignUpdate']").validate({
-              rules: {
-                name: {
-                  required: true,
-                  minlength: 2,
-                  maxlength: 20,
-                  lettersonly: true,
-                },
-                client_name:{
-                  required: true,
-                },
-                cpmethod: "required",
-                dncr_required: "required",
-                start_age:{
-                  required: function(el){
-                    return $(el).closest('form').find('#age_criteria').is(':checked') == true;
-                  }
-                },
-                end_age:{
-                  required: function(el){
-                    return $(el).closest('form').find('#age_criteria').is(':checked') == true;
-                  }
-                },
-                state_list:{
-                  required: function(el){
-                    return $(el).closest('form').find('#state_criteria').is(':checked') == true;
-                  }
-                },
-                postcode_list:{
-                  required:function(el){
-                    return $(el).closest('form').find('#postcode_criteria').is(':checked') == true;
-                  },
-                  number:true,
-                }  
+          jQuery("form[name='campaignUpdate']").validate({
+            rules: {
+              name: {
+                required: true,
+                minlength: 2,
+                maxlength: 20,
+                lettersonly: true,
               },
-              messages: {
-                name: "Please enter your name",
-                client_name: {
-                  required:"Please select a client name",
-                },
-                cpmethod: {
-                  required: "Please select a method.",
-                },
-                dncr_required: "Please select dncr required",
-                start_age:"Please select Min Age",
-                end_age:"Please select Max Age",
-                state_list:"Please enter a state",
-                postcode_list:{
-                  required :"Please enter a postcode",
-                  number :"Please enter numeric value",
+              client_name:{
+                required: true,
+              },
+              cpmethod: "required",
+              dncr_required: "required",
+              start_age:{
+                required: function(el){
+                  return $(el).closest('form').find('#age_criteria').is(':checked') == true;
                 }
-              }, 
-              onfocusout: function(element) {
-                this.element(element);
               },
-              submitHandler: function(form) {
-                jQuery.ajax({
-                  url: form.action,
-                  type: form.method,
-                  data: $(form).serialize(),
-                  dataType: "json",
-                  success: function(response) {
-                    if(response==1){
-                       $("#myModal").modal({
-                                              "backdrop"  : "static",
-                                              "keyboard"  : true,
-                                              "show"      : true
-                                          });
-                      jQuery('html').animate({ scrollTop: 0 }, 300);
-                                          setTimeout(function(){
-                                              window.location.href = "{{ action('CampaignController@index') }}";
-                                          }, 3000);
-                    } else{
-                      $('#msg').text('Some problem occurred, campaign not updated.').show().delay('3000').hide();
-                    }
-                  },
-                  error: function(jqXHR, textStatus, errorThrown){
-                    alert('some problem occurred, please try again.');
-                  }
-                });
+              end_age:{
+                required: function(el){
+                  return $(el).closest('form').find('#age_criteria').is(':checked') == true;
+                }
+              },
+              state_list:{
+                required: function(el){
+                  return $(el).closest('form').find('#state_criteria').is(':checked') == true;
+                }
+              },
+              postcode_list:{
+                required:function(el){
+                  return $(el).closest('form').find('#postcode_criteria').is(':checked') == true;
+                },
+                number:true,
+              }  
+            },
+            messages: {
+              name: "Please enter your name",
+              client_name: {
+                required:"Please select a client name",
+              },
+              cpmethod: {
+                required: "Please select a method.",
+              },
+              dncr_required: "Please select dncr required",
+              start_age:"Please select Min Age",
+              end_age:"Please select Max Age",
+              state_list:"Please enter a state",
+              postcode_list:{
+                required :"Please enter a postcode",
+                number :"Please enter numeric value",
               }
-            });
-          });
-
-          jQuery(document).on('change','#cpmethod',function(){
-            var val = $(this).val();
-            if(val == 'API') {
-              $('.csv').hide();
-              $('.api').show();
-            } else if(val == 'CSV') {
-              $('.api').hide();
-              $('.csv').show();
-            } else {
-              $('.api').hide();
-              $('.csv').hide();
+            }, 
+            onfocusout: function(element) {
+              this.element(element);
+            },
+            submitHandler: function(form) {
+              jQuery.ajax({
+                url: form.action,
+                type: form.method,
+                data: $(form).serialize(),
+                dataType: "json",
+                success: function(response) {
+                  if(response==1){
+                     $("#myModal").modal({
+                                            "backdrop"  : "static",
+                                            "keyboard"  : true,
+                                            "show"      : true
+                                        });
+                    jQuery('html').animate({ scrollTop: 0 }, 300);
+                                        setTimeout(function(){
+                                            window.location.href = "{{ action('CampaignController@index') }}";
+                                        }, 3000);
+                  } else{
+                    $('#msg').text('Some problem occurred, campaign not updated.').show().delay('3000').hide();
+                  }
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                  alert('some problem occurred, please try again.');
+                }
+              });
             }
           });
+        });
+
+        jQuery(document).on('change','#cpmethod',function(){
+          var val = $(this).val();
+          if(val == 'API') {
+            $('.csv').hide();
+            $('.api').show();
+          } else if(val == 'CSV') {
+            $('.api').hide();
+            $('.csv').show();
+          } else {
+            $('.api').hide();
+            $('.csv').hide();
+          }
+        });
           
-          jQuery(document).on('change','#age_criteria',function(){
-            if($(this).is(":checked")) {
-              var checked = $(this).val();
-              $('#age_range').show();
-            } else {
-              $('#age_range').hide();
-            }
-          });
+        jQuery(document).on('change','#age_criteria',function(){
+          if($(this).is(":checked")) {
+            var checked = $(this).val();
+            $('#age_range').show();
+          } else {
+            $('#age_range').hide();
+          }
+        });
 
-          jQuery(document).on('change','#state_criteria',function(){
-            if($(this).is(":checked")) {
-              $('#state_list_hidden').show();
-            } else {
-              $('#state_list_hidden').hide()
-            }
-          });
-          jQuery(document).on('change','#postcode_criteria',function(){
-            if($(this).is(":checked")) {
-              $('#postcode_list_hidden').show()
-            } else {
-              $('#postcode_list_hidden').hide()
-            }
-          });
-          jQuery(document).on('click','#active',function(){
-            if(jQuery(this).is(':checked')==true){
-              jQuery(this).attr('checked','checked');
-              jQuery(this).val('1');
-            } else {
-              jQuery(this).removeAttr('checked');
-              jQuery(this).val('0');
-            }
-          });
-        /******** Enable/Disable button ******/
+        jQuery(document).on('change','#state_criteria',function(){
+          if($(this).is(":checked")) {
+            $('#state_list_hidden').show();
+          } else {
+            $('#state_list_hidden').hide()
+          }
+        });
+
+        jQuery(document).on('change','#postcode_criteria',function(){
+          if($(this).is(":checked")) {
+            $('#postcode_list_hidden').show()
+          } else {
+            $('#postcode_list_hidden').hide()
+          }
+        });
+        jQuery(document).on('click','#active',function(){
+          if(jQuery(this).is(':checked')==true){
+            jQuery(this).attr('checked','checked');
+            jQuery(this).val('1');
+          } else {
+            jQuery(this).removeAttr('checked');
+            jQuery(this).val('0');
+          }
+        });
+
+        /* Enable/Disable button */
         jQuery(document).ready(function(){
           $( "#name,#age_criteria,#state_list,#postcode_list,#csv_server,#directory,#csv_user,#csv_password" ).keyup(function(){
             $('#update').prop('disabled', false);
-            console.log( "Handler for .keypress() called." );
           });
           $('#age_criteria, #state_criteria, #postcode_criteria, .dncr_required, #active, #server_type, #csv_email,#csv_phone,#csv_title,#csv_firstName,#csv_lastName,#csv_birthdate,#csv_age,#csv_ageRange,#csv_gender,#csv_address1,#csv_address2,#csv_city,#csv_state,#csv_postcode,#csv_countryCode ').change(function(){
             $('#update').prop('disabled', false);
           });
         });
-        /******** END ******/
+        /* END */
     </script>
     </div>   
   @else

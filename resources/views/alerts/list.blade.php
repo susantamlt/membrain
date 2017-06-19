@@ -103,7 +103,7 @@
                             }
                         });
                         /* END: SHOWS EACH ALERT'S DETAILED VIEW IN POPUP MODAL */
-                        /***** Script for Acknowledge Alert button  ***/
+                        /* Script for Acknowledge Alert button */
                         $('#ack_alert').click(function(){
                             var id = $('#newid').val();  
                             $.ajax({
@@ -129,8 +129,8 @@
                                 }
                             });    
                         });
-                        /*****  END of Script for Acknowledge Alert button ***/
-                        /******  To Enable/Disable Delete button *****/
+                        /* END of Script for Acknowledge Alert button */
+                        /* To Enable/Disable Delete button */
                         $('.alert_checkbox').change(function() {
                             if ($('.alert_checkbox:checked').length) {
                                 $('#delete_alert_button').removeAttr('disabled');
@@ -138,9 +138,8 @@
                                 $('#delete_alert_button').attr('disabled', 'disabled');
                             }
                         });
-                        /******* END of To Enable/Disable Delete button  ********/
-
-                        /******  To Select/DeSelect all alerts checkboxes *****/
+                        /* END of To Enable/Disable Delete button */
+                        /* To Select/DeSelect all alerts checkboxes */
                         $('.alert_checkbox_all').change(function() {
                             if ($(this).is(':checked')) {
                                 $('.alert_checkbox').prop('checked', true);
@@ -150,9 +149,8 @@
                                 $('#delete_alert_button').attr('disabled', 'disabled');
                             }
                         });
-                        /******* END of To Select/DeSelect all alerts checkboxes  ********/
-
-                        /******  "Delete Selected Alerts" button *****/
+                        /* END of To Select/DeSelect all alerts checkboxes */
+                        /* "Delete Selected Alerts" button */
                         $('#delete_alert_button').click(function(){
                             var choice = confirm("Are you sure to delete this item?");
                             if(choice) {
@@ -180,7 +178,7 @@
                                 });  
                             }
                         });
-                        /******  END of "Delete Selected Alerts" button *****/                       
+                        /* END of "Delete Selected Alerts" button */                       
                     });
                 </script>                        
             </div>
