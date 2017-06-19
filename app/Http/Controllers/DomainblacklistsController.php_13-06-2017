@@ -1,0 +1,89 @@
+<?php
+namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+use App\Domainblacklist;
+use Excel;
+use DB;
+class DomainblacklistsController extends Controller
+{
+    public function __construct()  {
+        $this->middleware('auth');
+    }
+
+    public function index() {
+        $domainblacklists = Domainblacklist::all()->count();
+        return view('domainblacklists.list')
+            ->with(compact('domainblacklists'));
+    }
+
+    public function create() {
+        //
+    }
+
+    public function store(Request $request) {
+        $error = array();
+        $succe = array();
+        $dup = array();        
+        $vdom = array();        
+        $empty = 1;
+        if($request->hasFile('myfile')){
+            $path = $request->file('myfile')->getRealPath();
+            $data = Excel::load($path, function($reader) {})->get();
+            if(!empty($data) && $data->count() > 0){
+                foreach ($data->toArray() as $key => $value) {
+                    if(!empty($value) && filter_var($value['domain'], FILTER_VALIDATE_URL)){
+                        $result = DB::table('domain_blacklist')->where('domain',$value['domain'])->get(['id']);
+                        if($result->count() <= '0'){
+                            $domainblacklist = new Domainblacklist;
+                            $domainblacklist->domain = $value['domain'];
+                            $domainblacklist->comment = $value['comment'];
+                            if(!$domainblacklist->save()){
+                                $error[]=0;
+                            } else {
+                                $succe[] = 1;
+                            }  
+                        } else {
+                            $dup[]=0;
+                        }
+                    } else {
+                        $vdom[]=0;
+                    }
+                }
+            } else {
+                $empty = 0;
+            }
+        }
+        if(count($succe)>1){
+            $status=1;
+        } else {
+            $status=0;
+        }
+        return array('status'=>$status,'error'=>count($error),'success'=>count($succe),'empty'=>$empty,'total'=>$data->count(),'dup'=>count($dup),'vdom'=>count($vdom));
+    }
+
+    public function show($domainblacklists) {
+        //
+    }
+
+    public function edit($domainblacklists) {
+        //
+    }
+
+    public function update(Request $request, $id) {
+        //
+    }
+
+    public function destroy($domainblacklists) {
+        //
+    }
+
+    public function downloadExcelFile($type){
+        $domainblacklists = Domainblacklist::get()->toArray();
+        return Excel::create('domainblacklists', function($excel) use ($domainblacklists) {
+            $excel->sheet('domainblacklists', function($sheet) use ($domainblacklists) {
+                $sheet->fromArray($domainblacklists);
+            });
+        })->download($type);
+    }
+}

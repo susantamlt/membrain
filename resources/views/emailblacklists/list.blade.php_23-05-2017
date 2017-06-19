@@ -1,0 +1,46 @@
+@extends('layouts.app')
+@section('title','Add/Email Black Lists')
+@section('content')
+	<div class="xs">
+        <h3>Email Black Lists</h3>
+        <div class="well1 white">
+        	<div id="massage"></div>
+        	<h4>Current list has {{$emailblacklists}} Email Black Lists</h4>
+        	@if($emailblacklists > 0)
+        		<p><a href="{{ action('EmailblacklistsController@downloadExcelFile','csv') }}">Download</a>
+        	@endif
+            <fieldset>
+                <div class="form-group">
+                    <div id="fileuploader">Upload</div>
+                </div>
+            </fieldset>
+			<script type="text/javascript">
+				jQuery(document).ready(function() {
+					jQuery('#fileuploader').uploadFile({
+						url:"{{ action('EmailblacklistsController@store') }}",						
+						multiple:true,
+						autoSubmit:true,
+						fileName:'myfile',
+						allowedTypes : 'csv',
+						formData: {'_token':'{{ csrf_token() }}'},
+						maxFileCount:1,
+						onSuccess : function(files,data,xhr) {
+							if(data.status=='0' && data.empty=='0'){
+								jQuery('#massage').html('<ul class="error-success"><li class="success">Email Black List csv file has empty</li></ul>');
+								$('html').animate({ scrollTop: 0 }, 300);
+							} else if(data.status=='1') {
+								jQuery('#massage').html('<ul class="error-success"><li class="success">Email Black List csv data store '+data.success+'/'+data.total+'</li><li class="duplicate">Email Black List csv duplicate data '+data.dup+'/'+data.total+'</li><li class="error">Email Black List csv data not store '+data.error+'/'+data.total+'</li><li class="error">Email Black List domain not valid '+data.vdom+'/'+data.total+'</li></ul>');
+								$('html').animate({ scrollTop: 0 }, 300);
+								setTimeout(function(){
+									window.location.href = "{{ action('EmailblacklistsController@index') }}";
+								}, 3000);
+							} else {
+								jQuery('#massage').html('<ul class="error-success"><li class="success">Email Black List csv data store '+data.success+'/'+data.total+'</li><li class="duplicate">Email Black List csv duplicate data '+data.dup+'/'+data.total+'</li><li class="error">Email Black List csv data not store '+data.error+'/'+data.total+'</li><li class="error">Email Black List domain not valid '+data.vdom+'/'+data.total+'</li></ul>');
+							}
+						},
+					});
+				});
+			</script>
+        </div>
+    </div>
+@endsection

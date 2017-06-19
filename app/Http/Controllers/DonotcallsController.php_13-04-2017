@@ -1,0 +1,87 @@
+<?php
+namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+use App\Donotcall;
+use Excel;
+use DB;
+class DonotcallsController extends Controller
+{
+    public function __construct()  {
+        $this->middleware('auth');
+    }
+
+    public function index() {
+        $donotcalls = Donotcall::all()->count();
+        return view('donotcalls.list')
+            ->with(compact('donotcalls'));
+    }
+
+    public function create() {
+        //
+    }
+
+    public function store(Request $request) {
+        $error = array();
+        $succe = array();
+        $dup = array();
+        $empty = 1;
+        if($request->hasFile('myfile')){
+            $path = $request->file('myfile')->getRealPath();
+            $data = Excel::load($path, function($reader) {})->get();
+            if(!empty($data) && $data->count()>0){
+                foreach ($data->toArray() as $key => $value) {
+                    if(!empty($value)){
+                        $result = DB::table('membrain_global_do_not_call')->where('phone_number',$value['phone_number'])->get(['id']);
+                        if($result->count() <= '0'){
+                            $donotcall = new Donotcall;
+                            $donotcall->country_code = $value['country_code'];
+                            $donotcall->phone_number = $value['phone_number'];
+                            $donotcall->reason_code = $value['reason_code'];
+                            if(!$donotcall->save()){
+                                $error[]=0;
+                            } else {
+                                $succe[] = 1;
+                            }  
+                        } else {
+                            $dup[]=0;
+                        }
+                    }
+                }
+            } else {
+                $empty=0;
+            }
+        }
+        if(count($succe)>1){
+            $status=1;
+        } else {
+            $status=0;
+        }
+        return array('status'=>$status,'error'=>count($error),'success'=>count($succe),'empty'=>$empty,'total'=>$data->count(),'dup'=>count($dup));
+    }
+
+    public function show($donotcalls) {
+        //
+    }
+
+    public function edit($donotcalls) {
+        //
+    }
+
+    public function update(Request $request, $donotcalls) {
+        //
+    }
+
+    public function destroy($donotcalls) {
+        //
+    }
+
+    public function downloadExcelFile($type){
+        $donotcalls = Donotcall::get()->toArray();
+        return Excel::create('donotcall', function($excel) use ($donotcalls) {
+            $excel->sheet('donotcall', function($sheet) use ($donotcalls) {
+                $sheet->fromArray($donotcalls);
+            });
+        })->download($type);
+    }
+}

@@ -1,0 +1,89 @@
+<?php
+namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+use App\Salaciousword;
+use Excel;
+use DB;
+class SalaciouswordsController extends Controller
+{
+    public function __construct()  {
+        $this->middleware('auth');
+    }
+
+    public function index() {
+        $salaciouswords = Salaciousword::all()->count();
+        return view('salaciouswords.list')
+            ->with(compact('salaciouswords'));
+    }
+
+    public function create() {
+        //
+    }
+
+    public function store(Request $request) {
+        $error = array();
+        $succe = array();
+        $dup = array();
+        $empty = 1;
+        if($request->hasFile('myfile')){
+            $path = $request->file('myfile')->getRealPath();
+            $data = Excel::load($path, function($reader) {})->get();
+            if(!empty($data) && $data->count()){
+                foreach ($data->toArray() as $key => $value) {
+                    if(!empty($value) && $value['pattern']!=''){
+                        $result = DB::table('salacious_word')->where('pattern',$value['pattern'])->get(['id']);
+                        if($result->count() <= '0'){
+                            $salaciousword = new Salaciousword;
+                            $salaciousword->pattern = $value['pattern'];
+                            $salaciousword->email_address = (bool)$value['email_address'];
+                            $salaciousword->first_name = (bool)$value['first_name'];
+                            $salaciousword->last_name = (bool)$value['last_name'];
+                            $salaciousword->address = (bool)$value['address'];
+                            if(!$salaciousword->save()){
+                                $error[]=0;
+                            } else {
+                                $succe[] = 1;
+                            }  
+                        } else {
+                            $dup[]=0;
+                        }
+                    }
+                }
+            } else {
+                $empty = 0;
+            }
+        }
+        if(count($succe)>0){
+            $status=1;
+        } else {
+            $status=0;
+        }
+        return array('status'=>$status,'error'=>count($error),'success'=>count($succe),'empty'=>$empty,'total'=>$data->count(),'dup'=>count($dup));
+    }
+
+    public function show($salaciouswords) {
+        //
+    }
+
+    public function edit($salaciouswords) {
+        //
+    }
+
+    public function update(Request $request, $salaciouswords) {
+        //
+    }
+
+    public function destroy($salaciouswords) {
+        //
+    }
+
+    public function downloadExcelFile($type){
+        $salaciouswords = Salaciousword::get()->toArray();
+        return Excel::create('salaciouswords', function($excel) use ($salaciouswords) {
+            $excel->sheet('salaciouswords', function($sheet) use ($salaciouswords) {
+                $sheet->fromArray($salaciouswords);
+            });
+        })->download($type);
+    }
+}

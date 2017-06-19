@@ -1,0 +1,22 @@
+TRUNCATE `fraud_detection`;
+INSERT INTO `fraud_detection` (`id`, `supplier_id`, `source`, `client_id`, `campaign_id`, `email_address`, `phone`, `first_name`, `last_name`, `postcode`, `received`) VALUES
+(1, 1, 'ss.csv', 1, '1', 'foo@bar.com', '0412341234', 'Freddie', 'Farkus', '2000', '2017-06-01 00:00:00'),
+(2, 1, 'ss.csv', 1, '1', 'fred@farkus.com', '0412341234', 'Fred', 'Farkus', '2010', '2017-06-01 00:00:00'),
+(3, 1, 'ss.csv', 1, '1', 'fred.1@farkus.com', '0412341234', 'Freds', 'Farkuss', '2010', '2017-06-01 00:00:00'),
+(4, 1, 'ss.csv', 1, '1', 'foo1@bar.com', '0412341234', 'Freddies', 'Farkuss', '2000', '2017-06-01 00:00:00'),
+(5, 1, 'ss.csv', 1, '1', 'foo@bar.com', '0412341235', 'Freddie', 'Farkus', '2000', '2017-06-01 00:00:00'),
+(6, 1, 'ss.csv', 1, '1', 'foo@bar.com', '0412341235', 'Priyanka', 'Mondal', '2001', '2017-06-01 00:00:00'),
+(7, 1, 'ss.csv', 1, '1', 'foo@bar.com', '0412341235', 'Reshma', 'Sultana', '2012', '2017-06-01 00:00:00'),
+(8, 1, 'ss.csv', 1, '1', 'foo@bar.com', '0412341235', 'Tumpa', 'Maity', '2003', '2017-06-01 00:00:00'),
+(9, 1, 'ss.csv', 1, '1', 'foo@bar.com', '0412341235', 'Riya', 'Panja', '2014', '2017-06-01 00:00:00'),
+(10, 1, 'ss.csv', 1, '1', 'foo@bar.com', '0412341235', 'Debasmita', 'Ghuha Roy', '2015', '2017-06-01 00:00:00'),
+(11, 1, 'ss.csv', 1, '1', 'foo@bar.com', '0412341235', 'Priyanka', 'Bhagat', '2016', '2017-06-01 00:00:00'),
+(12, 2, 'vbfdbd.csv', 2, '2', 'susanta@xcz.com', '9696969696', 'tootal', 'fdsafdas', '45448', '2017-06-05 19:50:50'),
+(13, 1, 'vbfdbd.csv', 2, '2', 'foo@bar.com', '9696969696', 'Poulami', 'Biswas', '45448', '2017-06-05 19:50:50'),
+(14, 2, 'vbfdbd.csv', 2, '2', 'foos+1@bar.com', '96969696996', 'ssafdsafs', 'fdsafdass', '45448', '2017-06-05 19:50:50'),
+(15, 1, 'vbfdbd.csv', 2, '2', 'foo@bar.com', '96969696996', 'Lata', 'Adak', '45448', '2017-06-05 19:50:50'),
+(16, 2, 'vbfdbd.csv', 2, '2', 'foos+5@xcz.com', '9696969690', 'php', 'fdsafdass', '45448', '2017-06-05 19:50:50'),
+(17, 2, 'vbfdbd.csv', 2, '2', 'foo.1@bar.com', '96969696990', 'magento', 'fdsafdas', '45448', '2017-06-05 19:50:50'),
+(18, 1, 'ss.csv', 1, '1', 'foo@bar.com', '0412341236', 'Fred', 'Farkus', '2010', '2017-06-01 00:00:00'),
+(19, 1, 'ss.csv', 1, '1', 'foo@bar.com', '0412341237', 'Freddies', 'Farkuss', '2000', '2017-06-01 00:00:00'),
+(20, 1, 'ss.csv', 1, '1', 'foo@bar.com', '0412341238', 'Freds', 'Farkuss', '2010', '2017-06-01 00:00:00');

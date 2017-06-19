@@ -1,0 +1,46 @@
+@extends('layouts.app')
+@section('title','Add/Domain Black Lists')
+@section('content')
+	<div class="xs">
+        <h3>Domain Black Lists</h3>
+        <div class="well1 white">
+        	<div id="massage"></div>
+        	<h4>Current list has {{$domainblacklists}} Domain Black Lists</h4>
+        	@if($domainblacklists > 0)
+        		<p><a href="{{ action('DomainblacklistsController@downloadExcelFile','csv') }}">Download</a>
+        	@endif
+            <fieldset>
+                <div class="form-group">
+                    <div id="fileuploader">Upload</div>
+                </div>
+            </fieldset>
+			<script type="text/javascript">
+				jQuery(document).ready(function() {
+					jQuery('#fileuploader').uploadFile({
+						url:"{{ action('DomainblacklistsController@store') }}",						
+						multiple:true,
+						autoSubmit:true,
+						fileName:'myfile',
+						allowedTypes : 'csv',
+						formData: {'_token':'{{ csrf_token() }}'},
+						maxFileCount:1,
+						onSuccess : function(files,data,xhr) {
+							if(data.status=='0' && data.empty=='0'){
+								jQuery('#massage').html('<ul class="error-success"><li class="empty">Domain Black List csv file have empty</li></ul>');
+								$('html').animate({ scrollTop: 0 }, 300);
+							} else if(data.status=='1') {
+								jQuery('#massage').html('<ul class="error-success"><li class="success">Domain Black List csv data store '+data.success+'/'+data.total+'</li><li class="duplicate">Domain Black List csv duplicate data '+data.dup+'/'+data.total+'</li><li class="error">Domain Black List csv data not store '+data.error+'/'+data.total+'</li><li class="error">Domain Black List domain not valid '+data.vdom+'/'+data.total+'</li></ul>');
+								$('html').animate({ scrollTop: 0 }, 300);
+								setTimeout(function(){
+									window.location.href = "{{ action('DomainblacklistsController@index') }}";
+								}, 3000);
+							} else {
+								jQuery('#massage').html('<ul class="error-success"><li class="success">Domain Black List csv data store '+data.success+'/'+data.total+'</li><li class="duplicate">Domain Black List csv duplicate data '+data.dup+'/'+data.total+'</li><li class="error">Domain Black List csv data not store '+data.error+'/'+data.total+'</li><li class="error">Domain Black List domain not valid '+data.vdom+'/'+data.total+'</li></ul>');
+							}
+						},
+					});
+				});
+			</script>
+        </div>
+    </div>
+@endsection

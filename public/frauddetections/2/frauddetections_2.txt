@@ -1,0 +1,7 @@
+
+
+Suspicious Email Addresses 
+
+ssafdsafs , fdsafdass , foos+1@bar.com
+php , fdsafdass , foos+5@xcz.com
+magento , fdsafdas , foo.1@bar.com

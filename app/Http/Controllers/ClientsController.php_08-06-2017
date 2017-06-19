@@ -1,0 +1,100 @@
+<?php
+namespace App\Http\Controllers;
+use Illuminate\Http\Request;
+use App\Client;
+use App\Country;
+use DB;
+class ClientsController extends Controller
+{
+    public function __construct()  {
+        $this->middleware('auth');
+    }
+
+    public function index() {
+        // $clients = DB::table('clients')
+        //     ->select('clients.*','countries.name as cntname')
+        //     ->leftjoin('countries', 'clients.country_code', '=', 'countries.code')
+        //     ->orderBy('name', 'ASC')->get();
+        // return view('clients.list')->with(compact('clients'));
+         $clients=DB::select( DB::raw("SELECT clients.*,(SELECT COUNT(*) FROM protal_user WHERE protal_user.client_id = clients.id) AS PortalUser, (SELECT COUNT(*) FROM campaigns WHERE campaigns.`client_id` = clients.id) AS TotalCampaigns FROM  clients"));
+        return view('clients.list')->with(compact('clients'));
+    }
+
+    public function create() {
+        $countries = Country::all();
+        return view('clients.create')->with(compact('countries'));
+    }
+
+    public function store(Request $request) {
+        $result = DB::table('clients')->where('contact_email',$request->input('contact_email'))->where('contact_phone','=',$request->input('contact_phone'),'OR')->get(['id']);
+        if($result->count() <= '0'){
+            $client = new Client;
+            $client->name = $request->input('name');
+            $client->contact_email = $request->input('contact_email');
+            $client->contact_name = $request->input('contact_name');
+            $client->contact_phone = $request->input('contact_phone');
+            $client->active = (bool)$request->input('active');        
+            $client->country_code = $request->input('country_code');
+            $client->email_suppression = (bool)$request->input('email_suppression');
+            $client->phone_suppression = (bool)$request->input('phone_suppression');
+            // $filename = time().'.'.$request->fiemail_suppression->getClientOriginalExtension();
+         
+            // $request->email_suppression->move(public_path('suppression'), $photoName);
+            
+            $client->lead_expiry_days = $request->input('lead_expiry_days');
+            if(!$client->save()){
+                return 0;
+            } else {
+                return 1;
+            }
+        } else {
+            return 2;
+        }
+    }
+
+    public function show($client) {
+        //
+    }
+
+    public function edit($client) {
+        $client = Client::find($client);
+        $countries = Country::all();
+        return view('clients.edit')
+            ->with(compact('client'))
+            ->with(compact('countries'));
+    }
+
+    public function update(Request $request, $client) {
+        $result = DB::table('clients')->where('contact_email',$request->input('contact_email'))->where('contact_phone','=',$request->input('contact_phone'),'OR')->get(['id']);
+        if($result->count()=='1' && $result[0]->id==$client){
+            $_client = Client::find($client);
+            $_client->name = $request->input('name');
+            $_client->contact_email = $request->input('contact_email');
+            $_client->contact_name = $request->input('contact_name');
+            $_client->contact_phone = $request->input('contact_phone');
+            $_client->active = (bool)$request->input('active');        
+            $_client->country_code = $request->input('country_code');
+            $_client->email_suppression = (bool)$request->input('email_suppression');
+            $_client->phone_suppression = (bool)$request->input('phone_suppression');
+            $_client->lead_expiry_days = $request->input('lead_expiry_days');
+            if(!$_client->save()){
+                return 0;
+            } else {
+                return 1;
+            }
+        } else {
+            return 2;
+        }
+    }
+
+    public function destroy($client) {
+        $_client = Client::find($client);
+        if(!$_client->delete()){
+            return 0;
+        } else {
+            DB::table('client_email_suppression')->where('client_id',$client)->delete();
+            DB::table('client_phone_suppression')->where('client_id',$client)->delete();
+            return 1;
+        }
+    }
+}

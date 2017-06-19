@@ -1,0 +1,213 @@
+<?php
+namespace App\Http\Controllers;
+use Illuminate\Http\Request;
+use App\Client;
+use App\Country;
+use DB;
+use Excel;
+class ClientsController extends Controller
+{
+    public function __construct()  {
+        $this->middleware('auth');
+    }
+
+    public function index() {
+        $clients=DB::select( DB::raw("SELECT clients.*,(SELECT COUNT(*) FROM protal_user WHERE protal_user.client_id = clients.id) AS PortalUser, (SELECT COUNT(*) FROM campaigns WHERE campaigns.client_id = clients.id) AS TotalCampaigns FROM  clients"));
+        return view('clients.list')->with(compact('clients'));
+    }
+
+    public function create() {
+        $countries = Country::all();
+        return view('clients.create')->with(compact('countries'));
+    }
+
+    public function store(Request $request) {
+        $result = DB::table('clients')->where('contact_email',$request->input('contact_email'))->where('contact_phone','=',$request->input('contact_phone'),'OR')->get(['id']);
+        if($result->count() <= '0'){
+            $client = new Client;
+            $client->name = $request->input('name');
+            $client->contact_email = $request->input('contact_email');
+            $client->contact_name = $request->input('contact_name');
+            $client->contact_phone = $request->input('contact_phone');
+            $client->active = (bool)$request->input('active');        
+            $client->country_code = $request->input('country_code');
+
+            if($request->input('tmp_client_id_email')) {
+                $tmp_client_id_email=$request->input('tmp_client_id_email');
+                $email_suppression=1;
+            }else{
+                $email_suppression=0;
+            }
+
+            if($request->input('tmp_client_id_phone')) {
+                $tmp_client_id_phone=$request->input('tmp_client_id_phone');
+                $phone_suppression=1;
+            }else{
+                $phone_suppression=0;
+            }
+
+            $client->email_suppression = $email_suppression;
+            $client->phone_suppression = $phone_suppression;            
+            $client->lead_expiry_days = $request->input('lead_expiry_days');
+            if(!$client->save()){
+                return 0;
+            } else {
+                $insertedId = $client->id;
+                if($request->input('tmp_client_id_email')!=''){
+                    DB::table('client_email_suppression')
+                    ->where('client_id', $request->input('tmp_client_id_email'))
+                    ->update(['client_id' => $insertedId]);
+                }
+                if($request->input('tmp_client_id_phone')!=''){
+                    DB::table('client_phone_suppression')
+                    ->where('client_id', $request->input('tmp_client_id_phone'))
+                    ->update(['client_id' => $insertedId]);
+                }
+
+                return 1;
+            }
+        } else {
+            return 2;
+        }
+    }
+
+    public function show($client) {
+        //
+    }
+
+    public function edit($client) {
+        $clients = DB::select(DB::raw("SELECT clients.*,(SELECT COUNT(*) FROM client_email_suppression WHERE client_email_suppression.client_id = clients.id) AS ce_suppression, (SELECT COUNT(*) FROM client_phone_suppression WHERE client_phone_suppression.client_id = clients.id) AS cp_suppression FROM  clients WHERE clients.id='".$client."'"));
+        $client = $clients[0];
+        $countries = Country::all();
+        return view('clients.edit')
+            ->with(compact('client'))
+            ->with(compact('countries'));
+    }
+
+    public function update(Request $request, $client) {
+        $result = DB::table('clients')->where('contact_email',$request->input('contact_email'))->where('contact_phone','=',$request->input('contact_phone'),'OR')->get(['id']);
+        if($result->count()=='1' && $result[0]->id==$client){
+            $_client = Client::find($client);
+            $_client->name = $request->input('name');
+            $_client->contact_email = $request->input('contact_email');
+            $_client->contact_name = $request->input('contact_name');
+            $_client->contact_phone = $request->input('contact_phone');
+            $_client->active = (bool)$request->input('active');        
+            $_client->country_code = $request->input('country_code');
+
+            if($request->input('tmp_client_id_email')) {
+                $tmp_client_id_email=$request->input('tmp_client_id_email');
+                $email_suppression=1;
+            }else{
+                $email_suppression=0;
+            }
+
+            if($request->input('tmp_client_id_phone')) {
+                $tmp_client_id_phone=$request->input('tmp_client_id_phone');
+                $phone_suppression=1;
+            }else{
+                $phone_suppression=0;
+            }
+
+            $_client->email_suppression = $email_suppression;
+            $_client->phone_suppression = $phone_suppression;
+            $_client->lead_expiry_days = $request->input('lead_expiry_days');
+            if(!$_client->save()){
+                return 0;
+            } else {
+                $insertedId = $client;
+
+                if($request->input('tmp_client_id_email')!=''){
+                    DB::table('client_email_suppression')
+                    ->where('client_id', $request->input('tmp_client_id_email'))
+                    ->update(['client_id' => $insertedId]);
+                }
+                if($request->input('tmp_client_id_phone')!=''){
+                    DB::table('client_phone_suppression')
+                    ->where('client_id', $request->input('tmp_client_id_phone'))
+                    ->update(['client_id' => $insertedId]);
+                }
+
+                return 1;
+            }
+        } else {
+            return 2;
+        }
+    }
+
+    public function destroy($client) {
+        $_client = Client::find($client);
+        if(!$_client->delete()){
+            return 0;
+        } else {
+            DB::table('client_email_suppression')->where('client_id',$client)->delete();
+            DB::table('client_phone_suppression')->where('client_id',$client)->delete();
+            return 1;
+        }
+    }
+
+    public function upload(Request $request) {
+        $path = public_path('client-file');
+        \File::cleanDirectory($path);
+        $file = $request->file('myfile');
+        $type_file = $request->input('typ');
+        $tmp_client_id = time()+rand(1000,9999);
+        $paths = $request->file('myfile')->getRealPath();
+        $data = Excel::load($paths, function($reader) {})->get();
+        if(!empty($data) && $data->count() > 0){
+            foreach ($data->toArray() as $key => $value) {
+                if($type_file=='email'){
+                    if(!empty($value) && isset($value['email'])){
+                        $result = DB::table('client_email_suppression')->where('data',$value['email'])->get(['id']);
+                        if($result->count() <= '0'){
+                            $id = DB::table('client_email_suppression')->insertGetId(['client_id'=>$tmp_client_id,'data' => $value['email']]);
+                            if(!$id){
+                                $error[]=0;
+                            } else {
+                                $succe[] = 1;
+                            }
+                        } else {
+                            $dup[]=0;
+                        }
+                        $st = 0;
+                    } else {
+                        $st = 1;
+                    }
+                }
+
+                if($type_file=='phone'){
+                    if(!empty($value) && isset($value['phone_number'])){
+                        $result = DB::table('client_phone_suppression')->where('data',$value['phone_number'])->get(['id']);
+                        if($result->count() <= '0'){
+                                $id = DB::table('client_phone_suppression')->insertGetId(['client_id'=>$tmp_client_id,'data' => $value['phone_number']]);
+                            if(!$id){
+                                $error[]=0;
+                            } else {
+                                $succe[] = 1;
+                            }  
+                        } else {
+                            $dup[]=0;
+                        }
+                        $st = 0;
+                    }  else {
+                        $st = 1;
+                    }
+                } 
+            }
+        } else {
+            $empty=0;
+        }
+        if($st!=1){
+            $imageFileName = time() . '.' . $file->getClientOriginalExtension();
+            if(!$request->myfile->move($path, $imageFileName)){
+                $result = array('status'=>'0','fname'=>$imageFileName,'tmp_client_id'=>$tmp_client_id);
+            } else {
+                $result = array('status'=>'1','fname'=>$imageFileName,'tmp_client_id'=>$tmp_client_id);
+            }
+        } else {
+            $result = array('status'=>'2','fname'=>'','tmp_client_id'=>'');
+        }
+
+        return $result;
+    }
+}

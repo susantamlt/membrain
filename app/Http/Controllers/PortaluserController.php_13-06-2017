@@ -1,0 +1,161 @@
+<?php
+namespace App\Http\Controllers;
+use Illuminate\Http\Request;
+use App\Portal;
+use App\Client;
+use App\Supplier;
+use App\Portalrole;
+use App\Portalsubclient;
+use DB;
+class PortaluserController extends Controller
+{
+    public function __construct()  {
+        $this->middleware('auth');
+    }
+
+    public function index() {
+        $portalusers = DB::table('protal_user as portalusers')
+            ->select('portalusers.*','clients.contact_name as cname','suppliers.contact_name as sname','portal_role.name as rname')
+            ->leftjoin('clients', 'portalusers.client_id', '=', 'clients.id')
+            ->leftjoin('suppliers', 'portalusers.supplier_id', '=', 'suppliers.id')
+            ->leftjoin('portal_role', 'portalusers.role_id', '=', 'portal_role.id')
+            ->orderBy('portalusers.name', 'ASC')
+            ->get();
+        return view('portaluser.list')->with(compact('portalusers'));
+    }
+
+    public function create() {
+        $clients = Client::all();
+        $suppliers = Supplier::all();
+        $portalroles = Portalrole::all();
+        return view('portaluser.create')
+            ->with(compact('clients'))
+            ->with(compact('portalroles'))
+            ->with(compact('suppliers'));
+    }
+
+    public function store(Request $request) {
+        $result = DB::table('protal_user')->where('username',$request->input('username'))->get(['id']);
+        if($result->count() <= '0'){
+            $portaluser = new Portal;
+            $portaluser->username = $request->input('username');
+            $portaluser->name = $request->input('name');
+            $portaluser->password = bcrypt($request->input('password'));
+            $portaluser->role_id = $request->input('role_id');
+            $portaluser->client_id = ($request->input('client_id')=='' ? 0 : $request->input('client_id'));
+            $portaluser->supplier_id = ($request->input('supplier_id')=='' ? 0 : $request->input('supplier_id'));
+            $portaluser->active = (bool)$request->input('active');
+            if(!$portaluser->save()){
+                return 0;
+            } else {
+                if(!empty($request->input('clients_id')) && $request->input('client_id')==''){
+                    foreach ($request->input('clients_id') as $key => $client_id) {
+                        $portalsubclient = new Portalsubclient;
+                        $portalsubclient->portal_user_id = $portaluser->id;
+                        $portalsubclient->client_id = $client_id;
+                        $portalsubclient->save();
+                    }
+                }
+                return 1;
+            }
+        } else {
+            return 2;
+        }
+    }
+
+    public function show($portaluser) {
+        //
+    }
+
+    public function edit($portaluser) {
+        $clients = Client::all();
+        $suppliers = Supplier::all();
+        $portalroles = Portalrole::all();
+        $portaluser = Portal::find($portaluser);
+        //echo $portaluser->id;
+        $supclientsobj=DB::table("portal_sub_client")->where('portal_user_id','26')->get();
+        $supclients_arr=array();
+        foreach ($supclientsobj as $key => $value) {
+            //print_r($value->portal_user_id);
+            # code...
+            array_push($supclients_arr, $value->client_id);
+        }
+        //print_r($supclientsobj);
+        return view('portaluser.edit')
+            ->with(compact('portaluser'))
+            ->with(compact('clients'))
+            ->with(compact('portalroles'))
+            ->with(compact('suppliers'))
+            ->with(compact('supclients_arr'));
+    }
+
+    public function update(Request $request, $portaluser) {
+        $_portaluser = Portal::find($portaluser);
+        $result = DB::table('protal_user')->where('username',$request->input('username'))->get(['id']);
+        // print_r($result);    
+        // if($result->count()==1 && $result[0]->id==$portaluser){    
+
+            $_portaluser->username = $request->input('username');
+            $_portaluser->name = $request->input('name');
+            $_portaluser->role_id = $request->input('role_id');
+            $_portaluser->client_id = $request->input('client_id');
+            $_portaluser->supplier_id = $request->input('supplier_id');
+            $_portaluser->active = (bool)$request->input('active');
+            //echo $request->input('active');
+           
+            if(!$_portaluser->save()){
+
+                return 0;
+            } else {
+               // print_r($request->input('clients_id'));
+                if($request->input('role_id')==5){
+                if(!empty($request->input('clients_id')) && $request->input('client_id')==''){
+                    $portalsubclients = Portalsubclient::find($portaluser)->get(['client_id']);
+                    //$portalsubclients = Portalsubclient::find($portaluser)->get(['client_id']);
+                    foreach ($portalsubclients->toArray() as $key => $client) {
+                        $newdata[]=$client['client_id'];
+                    }
+                    foreach ($request->input('clients_id') as $key => $client_id) {
+                        //echo $client_id;
+                        if(!in_array($client_id, $newdata)){
+                            $portalsubclient = new Portalsubclient;
+                            $portalsubclient->portal_user_id = $portaluser;
+                            $portalsubclient->client_id = $client_id;
+                            $portalsubclient->save();                        
+                        } else {
+                            if(($key = array_search($client_id, $newdata)) !== false){
+                                unset($newdata[$key]);
+                            }
+                        }
+                    }
+                    
+                    foreach($newdata as $r => $cid) {
+                        DB::table('portal_sub_client')->where('client_id',$cid)->where('portal_user_id','=',$portaluser,'AND')->delete();
+                    }
+                } else {
+                    $_ortalsubclient = Portalsubclient::find($portaluser);
+                    
+                    if(sizeof($_ortalsubclient)>0){
+                        foreach ($_ortalsubclient as $okey => $ovalue) {
+                            DB::table('portal_sub_client')->where('id', $ovalue['id'])->delete(); 
+                        }
+                     }   
+                }
+            }
+                return 1;
+            }
+        // } else {
+        //     return 2;
+        // }
+    }
+
+    public function destroy($portaluser) {
+        $_portaluser = Portal::find($portaluser);
+        if(!$_portaluser->delete()){
+            return 0;
+        } else {
+            DB::table('portal_sub_client')->where('portal_user_id',$portaluser)->delete();
+            return 1;
+        }
+    }
+}

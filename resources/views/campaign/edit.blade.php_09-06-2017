@@ -1,0 +1,512 @@
+@extends('layouts.app')
+@section('title','Edit/Campaign')
+@section('content')
+<?php 
+    $age_array = array();
+    $age_array = explode('-', $campaign[0]->criteria_age);
+
+    if(sizeof($age_array)==1){
+      $age_array[0]=0;
+      $age_array[1]=0;
+    }
+
+    $sp_array = array();
+    $sp_array = json_decode( $campaign[0]->server_parameters ); 
+
+    $pm_array = array();
+    $pm_array = json_decode( $campaign[0]->parameter_mapping );
+
+    // echo "<pre>";
+    // print_r($sp_array);
+    // echo "</pre>";
+
+    // echo "<pre>";
+    // print_r($pm_array);
+    // echo "</pre>";    
+?>
+<div class="xs">
+<?php //echo '<pre>'; print_r($campaign); echo '</pre>'; exit;?>
+    <h3>Edit Campaign</h3>
+    <div class="well1 white">
+
+    <div class="control-group error" style="color:red">
+        <ul id="summary"></ul>
+    </div>
+
+        <form class="form-horizontal" name="campaignUpdate" id="campaignUpdate" method="post" action="{{ action('CampaignController@update', $campaign[0]->id ) }}">
+            {{ csrf_field() }}
+            {{method_field('PUT')}}
+            <input type="hidden" name="method_type" id="method_type" value="{{ $campaign[0]->method }}"/>
+           
+            <div class="form-group">
+                <label class="control-label">Name</label>
+                <input type="text" class="form-control1" id="name" name="name" value="{{ $campaign[0]->name}}" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Public ID</label>
+                <input type="text" class="form-control1" id="public_id" name="public_id" value="{{ $campaign[0]->public_id}}" readonly />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Client Name</label>
+                <input type="text" class="form-control1" id="client_name" value="{{ $campaign[0]->client_name}}" readonly />
+               <input type="hidden" name="client_name" value="{{ $campaign[0]->client_id}}">
+            </div>
+            <div class="form-group">
+                <label class="control-label">Method</label>
+                <input type="text" class="form-control1" id="method" name="method" value="{{ $campaign[0]->method}}" readonly />
+                <!-- <select class="form-control1" name="method" id="method">
+                    <option value="">---Please Select Method---</option>
+                    <option value="API" {{ $campaign[0]->method == 'API' ?'selected':''}} >API</option>
+                    <option value="CSV" {{ $campaign[0]->method == 'CSV' ?'selected':''}} >CSV</option>
+                </select> -->
+            </div>
+            <div class="form-group">
+               <div class="checkboxb checkbox-primary">
+                                <input id="age_criteria" name="age_criteria" class="age_criteria"  type="checkbox" <?php if($campaign[0]->criteria_age!='') {?> checked="checked" <?php } ?>>
+                                <label for="age_criteria">
+                                    Age Criteria
+                                </label>
+                        </div>
+             <!--  <label><input type="checkbox" name="age_criteria" class="age_criteria" id="age_criteria" value="1" checked>&nbsp;Age Criteria</label> -->
+            </div>
+
+            <div id="age_range">
+                <h4>Age Range</h4>
+                <div class="form-group">
+                    <select class="form-control1" name="start_age" id="start_age">
+                        <option value="">---Please Select Min Age---</option>
+                        <?php 
+
+                            for($i=0;$i<100;$i++)
+                            {?>
+                                <option value="{{$i}}" {{ $age_array[0] == $i ? "selected":"" }} > {{$i}} </option>;
+                        <?php } 
+
+                        ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <select class="form-control1" name="end_age" id="end_age">
+                        <option value="">---Please Select Max Age---</option>
+                        <?php 
+
+                            for($i=0;$i<100;$i++)
+                            {?>
+                                <option value="{{$i}}" <?php if(isset($age_array[1])){ ?> {{ $age_array[1] == $i ? "selected" :"" }} <?php } ?>> {{$i}} </option>;
+                        <?php } 
+                        ?>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="checkboxb checkbox-primary">
+                                <input id="state_criteria" name="state_criteria" class="state_criteria"  type="checkbox" <?php if($campaign[0]->criteria_state!='') {?> checked="checked" <?php } ?>>
+                                <label for="state_criteria">
+                                    State Criteria
+                                </label>
+                      </div>
+             <!--  <label><input type="checkbox" name="state_criteria" class="state_criteria" id="state_criteria" value="1" checked>&nbsp;State Criteria</label> -->
+            </div>
+
+            <div id="state_list_hidden">
+                <div class="form-group">
+                  <input type="text" name="state_list" class="state_list form-control1" id="state_list" value="{{$campaign[0]->criteria_state}}" >
+                </div>
+            </div>
+
+            <div class="form-group">
+              <div class="checkboxb checkbox-primary">
+                                <input id="postcode_criteria" name="postcode_criteria" class="postcode_criteria"  type="checkbox" <?php if($campaign[0]->criteria_postcode!='') {?> checked="checked" <?php } ?> >
+                                <label for="postcode_criteria">
+                                    Postcode Criteria
+                                </label>
+                      </div>
+             <!--  <label><input type="checkbox" name="postcode_criteria" class="postcode_criteria" id="postcode_criteria" value="1" checked>&nbsp;Postcode Criteria</label> -->
+            </div>
+
+            <div id="postcode_list_hidden">
+                <div class="form-group">
+                    <label for="postcode_list">Postcode List:</label>
+                  <textarea name="postcode_list" class="postcode_list form-control1" rows="5" id="postcode_list">{{$campaign[0]->criteria_postcode}}</textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+              <label>DNCR Required</label><br/>
+              <div class="radio radio-info radio-inline">
+                        <input type="radio" id="dncr_required1" value="0" class="dncr_required" name="dncr_required" {{ $campaign[0]->dncr_required == 0 ? "checked":"" }}>
+                        <label for="dncr_required1">Yes </label>
+                      </div>
+                      <div class="radio radio-inline radio-info">
+                          <input type="radio" id="dncr_required2" value="1" class="dncr_required" name="dncr_required" {{ $campaign[0]->dncr_required == 1 ? "checked":"" }}>
+                          <label for="dncr_required2"> No </label>
+                      </div>
+            <!--   <input type="radio" name="dncr_required" value="0" {{ $campaign[0]->dncr_required == 0 ? "checked":"" }}>Yes
+              <input type="radio" name="dncr_required" class="dncr_required" id="dncr_required" value="1" {{ $campaign[0]->dncr_required == 1 ? "checked":"" }} >No -->
+            </div>
+
+            <div class="form-group">
+                    <!-- <label><input type="checkbox" class="active" name="active" id="active" {{ $campaign[0]->active == 0 ? "checked":"" }} value="0" >&nbsp;Active</label> -->
+                    <div class="checkboxb checkbox-primary">
+                                <input id="active" name="active" class="active"  type="checkbox" {{ $campaign[0]->active == 0 ? "checked":"" }}>
+                                <label for="active">
+                                    Active
+                                </label>
+                    </div>
+            </div>
+
+
+    
+            <div class="API" @if($campaign[0]->method != 'API') style=display:none @endif >
+           
+                <div class="form-group">
+                  <label for="type">Type:</label>
+                  <select class="form-control1" id="type" name="type">
+                    <option value="">--Please select type--</option>
+                    <option value="GET" {{ $sp_array->type == "GET"? "selected":"" }} >GET</option>
+                    <option value="POST" {{ $sp_array->type == "POST"? "selected":"" }} >POST</option>
+                    <option value="JSON POST" {{ $sp_array->type == "JSON POST"? "selected":"" }} >JSON POST</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Endpoint</label>
+                    <input type="text" class="form-control1" id="endpoint" name="endpoint" class="endpoint" value="{{ isset($sp_array->endpoint) ? $sp_array->endpoint:'' }}" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label">User</label>
+                    <input type="text" class="form-control1" id="user" name="user" class="user" value="{{ isset($sp_array->user) ? $sp_array->user:'' }}" />
+                </div>    
+                <div class="form-group">
+                    <label class="control-label">Password</label>
+                    <input type="password" class="form-control1" id="password" name="password" class="password" value="{{ isset($sp_array->password)? $sp_array->password:'' }}" />
+                </div>    
+                <div class="form-group">
+                    <label class="control-label">Port</label>
+                    <input type="text" class="form-control1" id="port" name="port" class="port" value="{{ isset($sp_array->port) ? $sp_array->port:'' }}" />
+                </div>     
+                <h4>Standard Parameter Mapping Fields</h4>
+
+                <div class="form-group">
+                  <label for="email">email:</label>
+                  <input type="text" class="form-control1" id="email" name="email" value="{{ isset($pm_array->email) ? $pm_array->email:'' }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="phone">phone:</label>
+                  <input type="text" class="form-control1 phone" id="phone" name="phone" value="{{ isset($pm_array->phone) ? $pm_array->phone:'' }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="title">title:</label>
+                  <input type="text" class="form-control1 title" id="title" name="title" value="{{ isset($pm_array->title) ? $pm_array->title:'' }}" >
+                </div>
+
+                <div class="form-group">
+                  <label for="firstName">firstName:</label>
+                  <input type="text" class="form-control1 firstName" id="firstName" name="firstName" value="{{ isset($pm_array->firstName) ? $pm_array->firstName:'' }}" >
+                </div>
+
+                <div class="form-group">
+                  <label for="lastName">lastName:</label>
+                  <input type="text" class="form-control1 lastName" id="lastName" name="lastName" value="{{ isset($pm_array->lastName) ? $pm_array->lastName:'' }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="birthdate">birthdate:</label>
+                  <input type="text" class="form-control1 birthdate" id="birthdate" name="birthdate" value="{{ isset($pm_array->birthdate) ? $pm_array->birthdate:'' }}" >
+                </div>
+
+                <div class="form-group">
+                  <label for="age">age:</label>
+                  <input type="text" class="form-control1 age" id="age" name="age" value="{{ isset($pm_array->age) ? $pm_array->age:'' }}" >
+                </div>
+
+                <div class="form-group">
+                  <label for="ageRange">ageRange:</label>
+                  <input type="text" class="form-control1 ageRange" id="ageRange" name="ageRange" value="{{ isset($pm_array->ageRange) ? $pm_array->ageRange:'' }}" >
+                </div>
+
+                <div class="form-group">
+                  <label for="gender">gender:</label>
+                  <input type="text" class="form-control1 gender" id="gender" name="gender" value="{{ isset($pm_array->gender) ? $pm_array->gender:'' }}" >
+                </div>
+
+                <div class="form-group">
+                  <label for="address1">address1:</label>
+                  <input type="text" class="form-control1 address1" id="address1" name="address1" value="{{ isset($pm_array->address1) ? $pm_array->address1:'' }}" >
+                </div>
+
+                <div class="form-group">
+                  <label for="address2">address2:</label>
+                  <input type="text" class="form-control1 address2" id="address2" name="address2" value="{{ isset($pm_array->address2) ? $pm_array->address2:'' }}" >
+                </div>
+
+                <div class="form-group">
+                  <label for="city">city:</label>
+                  <input type="text" class="form-control1 city" id="city" name="city" value="{{ isset($pm_array->city) ? $pm_array->city:'' }}" >
+                </div>
+
+                <div class="form-group">
+                  <label for="state">state:</label>
+                  <input type="text" class="form-control1 state" id="state" name="state" value="{{ isset($pm_array->state) ? $pm_array->state:'' }}" >
+                </div>
+
+                <div class="form-group">
+                  <label for="postcode">postcode:</label>
+                  <input type="text" class="form-control1 postcode" id="postcode" name="postcode" value="{{ isset($pm_array->postcode) ? $pm_array->postcode:'' }}" >
+                </div>
+
+                <div class="form-group">
+                  <label for="countryCode">countryCode:</label>
+                  <input type="text" class="form-control1 countryCode" id="countryCode" name="countryCode" value="{{ isset($pm_array->countryCode) ? $pm_array->countryCode:'' }}" >
+                </div>
+
+            </div>
+       
+
+            <div class="CSV" @if($campaign[0]->method != 'CSV') style=display:none @endif >
+                <div class="form-group">
+                  <label for="server_type">Server Type:</label>
+                  <select class="form-control1" id="server_type" name="server_type">
+                    <option value="">--Please select server type--</option>
+                    <option value="ftp" {{ $sp_array->type == "ftp"? "selected":"" }} >FTP</option>
+                    <option value="sftp" {{ $sp_array->type == "sftp"? "selected":"" }}>SFTP</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Server</label>
+                    <input type="text" class="form-control1" id="csv_server" name="csv_server" class="csv_server" value="{{ isset($sp_array->server) ? $sp_array->server : '' }}" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Directory</label>
+                    <input type="text" class="form-control1" id="directory" name="directory" class="directory" value="{{ isset($sp_array->directory) ? $sp_array->directory : '' }}" />
+                </div>   
+                <div class="form-group">
+                    <label class="control-label">User</label>
+                    <input type="text" class="form-control1" id="csv_user" name="csv_user" class="csv_user" value="{{ isset($sp_array->user) ? $sp_array->user : '' }}" />
+                </div> 
+                <div class="form-group">
+                    <label class="control-label">Password</label>
+                    <input type="password" class="form-control1" id="csv_password" name="csv_password" class="csv_password" value="{{ isset($sp_array->password) ? $sp_array->password : '' }}" />
+                </div>    
+
+                <h4>Column-Mapping Fields</h4>
+
+                <div class="form-group">
+                  <label for="csv_email">email:</label>
+                  <input type="text" class="form-control1 csv_email" id="csv_email" name="csv_email" value="{{ isset($pm_array->email) ? $pm_array->email : '' }}" >
+                </div>
+
+                <div class="form-group">
+                  <label for="csv_phone">phone:</label>
+                  <input type="text" class="form-control1 csv_phone" id="csv_phone" name="csv_phone" value="{{ isset($pm_array->phone) ? $pm_array->phone : '' }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="csv_title">title:</label>
+                  <input type="text" class="form-control1 csv_title" id="csv_title" name="csv_title" value="{{ isset($pm_array->title) ? $pm_array->title : '' }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="csv_firstName">firstName:</label>
+                  <input type="text" class="form-control1 csv_firstName" id="csv_firstName" name="csv_firstName" value="{{ isset($pm_array->firstName) ? $pm_array->firstName : '' }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="csv_lastName">lastName:</label>
+                  <input type="text" class="form-control1 csv_lastName" id="csv_lastName" name="csv_lastName" value="{{ isset($pm_array->lastName) ? $pm_array->lastName : '' }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="csv_birthdate">birthdate:</label>
+                  <input type="text" class="form-control1 csv_birthdate" id="csv_birthdate" name="csv_birthdate" value="{{ isset($pm_array->birthdate) ? $pm_array->birthdate : '' }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="csv_age">age:</label>
+                  <input type="text" class="form-control1 csv_age" id="csv_age" name="csv_age" value="{{ isset($pm_array->age) ? $pm_array->age : '' }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="csv_ageRange">ageRange:</label>
+                  <input type="text" class="form-control1 csv_ageRange" id="csv_ageRange" name="csv_ageRange" value="{{ isset($pm_array->ageRange) ? $pm_array->ageRange : '' }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="csv_gender">gender:</label>
+                  <input type="text" class="form-control1 csv_gender" id="csv_gender" name="csv_gender" value="{{ isset($pm_array->gender) ? $pm_array->gender : '' }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="csv_address1">address1:</label>
+                  <input type="text" class="form-control1 csv_address1" id="csv_address1" name="csv_address1" value="{{ isset($pm_array->address1) ? $pm_array->address1 : '' }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="csv_address2">address2:</label>
+                  <input type="text" class="form-control1 csv_address2" id="csv_address2" name="csv_address2" value="{{ isset($pm_array->address2) ? $pm_array->address2 : '' }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="csv_city">city:</label>
+                  <input type="text" class="form-control1 csv_city" id="csv_city" name="csv_city" value="{{ isset($pm_array->city) ? $pm_array->city : '' }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="csv_state">state:</label>
+                  <input type="text" class="form-control1 csv_state" id="csv_state" name="csv_state" value="{{ isset($pm_array->state) ? $pm_array->state : '' }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="csv_postcode">postcode:</label>
+                  <input type="text" class="form-control1 csv_postcode" id="csv_postcode" name="csv_postcode" value="{{ isset($pm_array->postcode) ? $pm_array->postcode : '' }}">
+                </div>
+
+                <div class="form-group">
+                  <label for="csv_countryCode">countryCode:</label>
+                  <input type="text" class="form-control1 csv_countryCode" id="csv_countryCode" name="csv_countryCode" value="{{ isset($pm_array->countryCode) ? $pm_array->countryCode : '' }}">
+                </div>
+            </div>
+   
+            <div class="form-group">
+                <button type="submit" id="update" disabled="disabled" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+
+$(document).ready(function(){
+    jQuery("#campaignUpdate").validate({
+            errorClass: "invalid",
+            ignore: ":hidden",
+            rules: {
+                name: {
+                    required: true,
+                    minlength: 2,
+                    maxlength: 20,
+                    lettersonly: true
+                },
+                client_name:{
+                    required: true,
+                },
+                method: "required",
+                age_criteria: "required",
+                state_criteria: "required",
+                postcode_criteria: "required",
+                dncr_required: "required",
+                active:"required",
+                start_age:"required",
+                end_age:"required",
+                state_list:"required",
+                postcode_list:{
+                  required:true,
+                  number:true,
+                }  
+            },
+            messages: {
+                name: "Please enter your name",
+                client_name: {
+                    required:"Please select a client name",
+                },
+                method: {
+                    required: "Please select a method.",
+                },
+                age_criteria: "Please select Age Criteria",
+                state_criteria: "Please select state criteria",
+                postcode_criteria: "Please select Postcode Criteria",
+                dncr_required: "Please select dncr required",
+                active: "Please select active",
+                start_age:"Please select Min Age",
+                end_age:"Please select Max Age",
+                state_list:"Please enter a state",
+                postcode_list:{
+                required:"Please enter a postcode",
+                number:"Please enter numeric value",
+
+              }
+            }, 
+            showErrors: function(errorMap, errorList) {
+                var messages = '';
+                $.each( errorMap, function( key, value ) {
+                    messages = messages + "<li>" + key + ": " + value + "</li>";
+                });$("#summary").html(messages);
+            }
+            
+        });
+
+    $("#method").change(function(){
+        var val = $(this).val();
+        var method_type = $('#method_type').val();
+        alert(method_type);
+
+        if(val == 'API')
+        {
+            $('.CSV').hide();
+            $('.API').show();
+        }    
+        else
+        {
+            $('.API').hide();
+            $('.CSV').show();
+        }
+        if(method_type != val)
+        {
+            $('.'+val).find('input:text').val('');
+        }
+    });
+
+    $('.age_criteria').change(function() {
+
+        if($(this).is(":checked")) {
+            $('#age_range').show()
+        }
+        else
+        {
+            $('#age_range').hide()
+            $('#start_age').val('');
+            $('#end_age').val('');
+        }
+        
+    });
+
+    $('#state_criteria').change(function() {
+
+        if($(this).is(":checked")) {
+           $('#state_list_hidden').show();
+        }
+        else
+        {
+            $('#state_list_hidden').hide()
+            $('#state_list').val('');
+        }
+        
+    });
+    $('#postcode_criteria').change(function() {
+
+        if($(this).is(":checked")) {
+            
+            $('#postcode_list_hidden').show();
+        }
+        else
+        {
+            $('#postcode_list_hidden').hide();
+            $('#postcode_list').val('');
+        }
+    });
+
+    /******** Enable/Disable button ******/
+      $( "#name,#age_criteria,#state_list,#postcode_list,#csv_server,#directory,#csv_user,#csv_password,#csv_email,#csv_phone,#csv_title,#csv_firstName,#csv_lastName,#csv_birthdate,#csv_age,#csv_ageRange,#csv_gender,#csv_address1,#csv_address2,#csv_city,#csv_state,#csv_postcode,#csv_countryCode" ).keyup(function() {
+        $('#update').prop('disabled', false);
+        console.log( "Handler for .keypress() called." );
+      });
+
+      $('#age_criteria, #state_criteria, #postcode_criteria, .dncr_required, #active, #server_type').change(function(){
+          $('#update').prop('disabled', false);
+      });
+     /******** END ******/
+});
+</script>
+@endsection

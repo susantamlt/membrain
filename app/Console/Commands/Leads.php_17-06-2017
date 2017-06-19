@@ -1,0 +1,35 @@
+<?php
+namespace App\Console\Commands;
+use Illuminate\Console\Command;
+use App\Models\clearExpiredLead;
+use DB;
+class Leads extends Command
+{
+    protected $signature = 'leads:clear';
+    protected $description = 'Clear all expairy leads';    
+	protected $clearExpiredLead;
+
+    public function __construct(clearExpiredLead $clearExpiredLead) {
+        parent::__construct();
+        $this->clearExpiredLead = $clearExpiredLead;
+        set_time_limit(0);
+    }
+
+    public function handle() {
+        $leadhistorys = DB::table('clients')->select('clients.id','clients.lead_expiry_days','leadhistory.id as lhid','leadhistory.delivered')
+            ->join('lead_history as leadhistory','leadhistory.client_id','=','clients.id')
+            ->where('clients.active','=','1')
+            ->get();
+        if(!empty($leadhistorys)){   
+            foreach ($leadhistorys as $key => $_leadhistory) {  
+                $date = date('Y-m-d h:i:s a');
+                $delivered = date('Y-m-d h:i:s a', strtotime($date .' -'.$_leadhistory->lead_expiry_days.' day'));
+                if(strtotime($_leadhistory->delivered) <= strtotime($delivered)){
+                    DB::table('lead_history')
+                        ->where('id','=', $_leadhistory->lhid)
+                        ->delete();
+                }
+            }
+        }
+    }
+}

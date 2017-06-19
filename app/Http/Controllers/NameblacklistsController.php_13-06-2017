@@ -1,0 +1,89 @@
+<?php
+namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+use App\Nameblacklist;
+use Excel;
+use DB;
+class NameblacklistsController extends Controller
+{
+    public function __construct()  {
+        $this->middleware('auth');
+    }
+
+    public function index() {
+        $nameblacklists = Nameblacklist::all()->count();
+        return view('nameblacklists.list')
+            ->with(compact('nameblacklists'));
+    }
+
+    public function create() {
+        //
+    }
+
+    public function store(Request $request) {
+        $error = array();
+        $succe = array();
+        $vname = array();
+        $dup = array();
+        $empty = 1;
+        if($request->hasFile('myfile')){
+            $path = $request->file('myfile')->getRealPath();
+            $data = Excel::load($path, function($reader) {})->get();
+            if(!empty($data) && $data->count()>0){
+                foreach ($data->toArray() as $key => $value) {
+                    if(!empty($value) && $value['name']!='' && preg_match("/^[a-zA-Z ]*$/", $value['name'])){
+                        $result = DB::table('name_blacklist')->where('name',$value['name'])->get(['id']);
+                        if($result->count() <= '0'){
+                            $nameblacklist = new Nameblacklist;
+                            $nameblacklist->name = $value['name'];
+                            $nameblacklist->comment = $value['comment'];
+                            if(!$nameblacklist->save()){
+                                $error[]=0;
+                            } else {
+                                $succe[] = 1;
+                            }  
+                        } else {
+                            $dup[]=0;
+                        }
+                    } else {
+                        $vname[]=0;
+                    }
+                }
+            } else {
+                $empty = 0;
+            }
+        }
+        if(count($succe)>0){
+            $status=1;
+        } else {
+            $status=0;
+        }
+        return array('status'=>$status,'error'=>count($error),'success'=>count($succe),'empty'=>$empty,'total'=>$data->count(),'dup'=>count($dup),'vname'=>count($vname));
+    }
+
+    public function show($nameblacklists) {
+        //
+    }
+
+    public function edit($nameblacklists) {
+        //
+    }
+
+    public function update(Request $request, $nameblacklists) {
+        //
+    }
+
+    public function destroy($nameblacklists) {
+        //
+    }
+
+    public function downloadExcelFile($type){
+        $nameblacklists = Nameblacklist::get()->toArray();
+        return Excel::create('nameblacklists', function($excel) use ($nameblacklists) {
+            $excel->sheet('nameblacklists', function($sheet) use ($nameblacklists) {
+                $sheet->fromArray($nameblacklists);
+            });
+        })->download($type);
+    }
+}

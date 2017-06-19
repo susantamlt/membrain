@@ -1,0 +1,68 @@
+Phone Number with Multiple Email Addresses 
+
+0412341234 , foo@bar.com
+0412341234 , fred@farkus.com
+0412341234 , fred.1@farkus.com
+0412341234 , foo1@bar.com
+
+Phone Numbers with Multiple Names 
+
+0412341234 , Freddie Farkus
+0412341234 , Fred Farkus
+0412341234 , Freds Farkuss
+0412341234 , Freddies Farkuss
+
+Phone Numbers with Multiple Postcodes 
+
+0412341234 , 2000
+0412341234 , 2010
+0412341234 , 2010
+0412341234 , 2000
+
+Email Address with Multiple Phone Numbers 
+
+foo@bar.com , 0412341234
+foo@bar.com , 0412341235
+foo@bar.com , 0412341235
+foo@bar.com , 0412341235
+foo@bar.com , 0412341235
+foo@bar.com , 0412341235
+foo@bar.com , 0412341235
+foo@bar.com , 0412341235
+foo@bar.com , 9696969696
+foo@bar.com , 96969696996
+foo@bar.com , 0412341236
+foo@bar.com , 0412341237
+foo@bar.com , 0412341238
+
+Email Address with Multiple Names 
+
+foo@bar.com , Freddie Farkus
+foo@bar.com , Freddie Farkus
+foo@bar.com , Priyanka Mondal
+foo@bar.com , Reshma Sultana
+foo@bar.com , Tumpa Maity
+foo@bar.com , Riya Panja
+foo@bar.com , Debasmita Ghuha Roy
+foo@bar.com , Priyanka Bhagat
+foo@bar.com , Poulami Biswas
+foo@bar.com , Lata Adak
+foo@bar.com , Fred Farkus
+foo@bar.com , Freddies Farkuss
+foo@bar.com , Freds Farkuss
+
+Email Address with Multiple Postcodes 
+
+foo@bar.com , 2000
+foo@bar.com , 2000
+foo@bar.com , 2001
+foo@bar.com , 2012
+foo@bar.com , 2003
+foo@bar.com , 2014
+foo@bar.com , 2015
+foo@bar.com , 2016
+foo@bar.com , 45448
+foo@bar.com , 45448
+foo@bar.com , 2010
+foo@bar.com , 2000
+foo@bar.com , 2010

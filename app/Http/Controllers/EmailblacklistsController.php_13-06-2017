@@ -1,0 +1,89 @@
+<?php
+namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+use App\Emailblacklist;
+use Excel;
+use DB;
+class EmailblacklistsController extends Controller
+{
+    public function __construct()  {
+        $this->middleware('auth');
+    }
+
+    public function index() {
+        $emailblacklists = Emailblacklist::all()->count();
+        return view('emailblacklists.list')
+            ->with(compact('emailblacklists'));
+    }
+
+    public function create() {
+        //
+    }
+
+    public function store(Request $request) {
+        $error = array();
+        $succe = array();
+        $vdom = array();
+        $dup = array();
+        $empty = 1;
+        if($request->hasFile('myfile')){
+            $path = $request->file('myfile')->getRealPath();
+            $data = Excel::load($path, function($reader) {})->get();
+            if(!empty($data) && $data->count() > 0){
+                foreach ($data->toArray() as $key => $value) {
+                    if(!empty($value) && filter_var($value['email_address'], FILTER_VALIDATE_EMAIL)){
+                        $result = DB::table('email_blacklist')->where('email_address',$value['email_address'])->get(['id']);
+                        if($result->count() <= '0'){
+                            $emailblacklist = new Emailblacklist;
+                            $emailblacklist->email_address = $value['email_address'];
+                            $emailblacklist->comment = $value['comment'];
+                            if(!$emailblacklist->save()){
+                                $error[]=0;
+                            } else {
+                                $succe[] = 1;
+                            }  
+                        } else {
+                            $dup[]=0;
+                        }
+                    } else {
+                        $vdom[]=0;
+                    }
+                }
+            } else {
+                $empty = 0;
+            }
+        }
+        if(count($succe)>0){
+            $status=1;
+        } else {
+            $status=0;
+        }
+        return array('status'=>$status,'error'=>count($error),'success'=>count($succe),'empty'=>$empty,'total'=>$data->count(),'dup'=>count($dup),'vdom'=>count($vdom));
+    }
+
+    public function show($id) {
+        //
+    }
+
+    public function edit($id) {
+        //
+    }
+
+    public function update(Request $request, $id) {
+        //
+    }
+
+    public function destroy($id) {
+        //
+    }
+
+    public function downloadExcelFile($type){
+        $emailblacklists = Emailblacklist::get()->toArray();
+        return Excel::create('emailblacklists', function($excel) use ($emailblacklists) {
+            $excel->sheet('emailblacklists', function($sheet) use ($emailblacklists) {
+                $sheet->fromArray($emailblacklists);
+            });
+        })->download($type);
+    }
+}

@@ -1,0 +1,94 @@
+@extends('layouts.login')
+@section('title','Reset Password')
+@section('content')
+    <div class="login-logo">
+        <a href="{{ url('/') }}">Membrain</a>
+    </div>
+    <h2 class="form-heading">login</h2>
+    <div class="app-cam">
+        @if (session('status'))
+            <div class="alert alert-success">
+                {{ session('status') }}
+            </div>
+        @endif
+        <form class="form-horizontal" role="form" method="POST" action="{{ route('password.request') }}" name="resetPassword">
+            {{ csrf_field() }}
+            <div class="form-group{{ $errors->has('username') ? ' has-error' : '' }}">
+                <input type="email" class="text" id="username" name="username" placeholder="E-mail Address">
+                @if ($errors->has('username'))
+                    <span class="help-block">
+                        <strong>{{ $errors->first('username') }}</strong>
+                    </span>
+                @endif
+            </div>
+            <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+                <input type="password" class="text" id="password"  name="password" placeholder="Password">
+                @if ($errors->has('password'))
+                    <span class="help-block">
+                        <strong>{{ $errors->first('password') }}</strong>
+                    </span>
+                @endif
+            </div>
+            <div class="form-group{{ $errors->has('password_confirmation') ? ' has-error' : '' }}">
+                <input type="password" class="text" id="password_confirmation"  name="password_confirmation" placeholder="Password Confirmation">
+                @if ($errors->has('password_confirmation'))
+                    <span class="help-block">
+                        <strong>{{ $errors->first('password_confirmation') }}</strong>
+                    </span>
+                @endif
+            </div>            
+            <div class="submit"><input type="submit" value="Reset Password"></div>           
+        </form>
+        <script type="text/javascript">
+            jQuery(function() {
+                $.validator.addMethod("regex",function(value, element, regexp) {
+                    if (regexp.constructor != RegExp)
+                        regexp = new RegExp(regexp);
+                    else if (regexp.global)
+                        regexp.lastIndex = 0;
+                    return this.optional(element) || regexp.test(value);
+                },"Please check your input.");
+                jQuery("form[name='resetPassword']").validate({
+                    rules: {
+                        username: {
+                            required: true,
+                            email: true,
+                            regex: "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$",
+                        },
+                        password: {
+                            required: true,
+                            minlength:  6,
+                        },
+                        password_confirmation: {
+                            required: true,
+                            minlength:  6,
+                            equalTo: "#password"
+                        }
+                    },
+                    messages: {
+                        username: {
+                            required:"Please enter a valid email address",
+                            email:"Please enter a valid email address",
+                            regex: 'Please enter a valid email without spacial chars, ie, Example@gmail.com'
+                        },
+                        password: {
+                            required: "Please enter a password.",
+                            minlength: "Please enter a password of 6 char",
+                        },
+                        password_confirmation: {
+                            required: "Please enter a password.",
+                            minlength: "Please enter a password of 6 char",
+                            equalTo:'Please enter match password',
+                        }
+                    },
+                    onfocusout: function(element) {
+                        this.element(element);
+                    },
+                    submitHandler: function(form) {
+                        form.submit();
+                    }
+                });
+            });
+        </script>
+    </div>
+@endsection

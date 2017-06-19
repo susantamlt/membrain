@@ -1,0 +1,60 @@
+@extends('layouts.login')
+@section('title','Forgotpassword')
+@section('content')
+    <div class="login-logo">
+        <a href="{{ url('/') }}">Membrain</a>
+    </div>
+    <h2 class="form-heading">login</h2>
+    <div class="app-cam">
+        @if (session('status'))
+            <div class="alert alert-success">
+                {{ session('status') }}
+            </div>
+        @endif
+        <form class="form-horizontal" role="form" method="POST" action="{{ route('password.email') }}" name="forgetPassword">
+            {{ csrf_field() }}
+            <div class="form-group{{ $errors->has('username') ? ' has-error' : '' }}">
+                <input type="email" class="text" id="username" name="username" placeholder="E-mail Address">
+                @if ($errors->has('username'))
+                    <span class="help-block">
+                        <strong>{{ $errors->first('username') }}</strong>
+                    </span>
+                @endif
+            </div>            
+            <div class="submit"><input type="submit" value="Send Password Reset Link"></div>           
+        </form>
+        <script type="text/javascript">
+            jQuery(function() {
+                $.validator.addMethod("regex",function(value, element, regexp) {
+                    if (regexp.constructor != RegExp)
+                        regexp = new RegExp(regexp);
+                    else if (regexp.global)
+                        regexp.lastIndex = 0;
+                    return this.optional(element) || regexp.test(value);
+                },"Please check your input.");
+                jQuery("form[name='forgetPassword']").validate({
+                    rules: {
+                        username: {
+                            required: true,
+                            email: true,
+                            regex: "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$",
+                        }
+                    },
+                    messages: {
+                        username: {
+                            required:"Please enter a valid email address",
+                            email:"Please enter a valid email address",
+                            regex: 'Please enter a valid email without spacial chars, ie, Example@gmail.com'
+                        }
+                    },
+                    onfocusout: function(element) {
+                        this.element(element);
+                    },
+                    submitHandler: function(form) {
+                        form.submit();
+                    }
+                });
+            });
+        </script>
+    </div>
+@endsection
