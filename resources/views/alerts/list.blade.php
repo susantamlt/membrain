@@ -1,7 +1,6 @@
 {{-- -------------------------------------------------
         Alerts View
             List of all Alerts
-
         Author: Latitude Global Partners
      -------------------------------------------------
 --}} 
