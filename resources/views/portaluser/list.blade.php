@@ -29,7 +29,11 @@
                                 <td>{{$portaluser->sname}}</td>
                                 <td>{{$portaluser->cname}}</td>
                                 <td>@if($portaluser->active==1)<i class="fa fa-check" aria-hidden="true"></i>@endif</td>
-                                <td>{{$portaluser->last_login}}</td>
+                                @if($portaluser->last_login !='')
+                                    <td>{{ date('dS M Y h:i:s a', strtotime($portaluser->last_login)) }}</td>
+                                @else
+                                    <td>&nbsp;</td>
+                                @endif
                                 <td><a href="{{ url('/portaluser/'.$portaluser->id.'/edit') }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a> | <a href="javascript:void(0);" onclick="destroy({{$portaluser->id}})"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>
                             </tr>
                         @endforeach
