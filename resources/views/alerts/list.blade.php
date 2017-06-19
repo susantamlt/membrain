@@ -1,8 +1,7 @@
-{{-- -------------------------------------------------
-        Alerts View
-            List of all Alerts
-        Author: Latitude Global Partners
-     -------------------------------------------------
+{{--
+    Alerts View:
+        List of all Alerts
+    Author: Latitude Global Partners
 --}} 
 
 @extends('layouts.app')
