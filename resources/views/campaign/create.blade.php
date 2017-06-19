@@ -264,7 +264,6 @@
                 </div>
               </div>    
               <h3>Column-Mapping Fields</h3>
-
               <div class="form-group">
                 <div class="col-sm-6">
                   <label for="csv_email">email:</label>
@@ -424,15 +423,15 @@
           </fieldset>
         </form>
         <div id="myModal" class="modal fade" role="dialog">
-                  <div class="modal-dialog">
-                      <div class="modal-header"></div>
-                      <div class="modal-content">
-                          <div class="modal-body">
-                              <p>Campaign has been Created </p>
-                          </div>
-                          <div class="modal-footer"></div>
-                      </div>
-                  </div>
+          <div class="modal-dialog">
+            <div class="modal-header"></div>
+            <div class="modal-content">
+              <div class="modal-body">
+                <p>Campaign has been Created </p>
+              </div>
+              <div class="modal-footer"></div>
+            </div>
+          </div>
         </div>
         <script type="text/javascript">
           jQuery(function() {
@@ -508,14 +507,14 @@
                   success: function(response) {
                     if(response==1){
                       $("#myModal").modal({
-                                              "backdrop"  : "static",
-                                              "keyboard"  : true,
-                                              "show"      : true
-                                          });
+                        "backdrop"  : "static",
+                        "keyboard"  : true,
+                        "show"      : true
+                      });
                       jQuery('html').animate({ scrollTop: 0 }, 300);
-                                          setTimeout(function(){
-                                              window.location.href = "{{ action('CampaignController@index') }}";
-                                          }, 3000);
+                      setTimeout(function(){
+                        window.location.href = "{{ action('CampaignController@index') }}";
+                      }, 3000);
                     } else{
                       $('#msg').text('Some problem occurred, campaign not created.').show().delay('3000').hide();
                     }
@@ -565,6 +564,7 @@
               $('#postcode_list_hidden').hide()
             }
           });
+          
           jQuery(document).on('click','#active',function(){
             if(jQuery(this).is(':checked')==true){
               jQuery(this).attr('checked','checked');
