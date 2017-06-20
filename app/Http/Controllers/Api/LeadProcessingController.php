@@ -7,14 +7,14 @@ use App\Models\Api\LeadProcessTable;
 class LeadProcessingController extends Controller
 {
     public function index() {
-       
+       return 'susanta Kumar Das';
     } 
 
     public function create() {
         //
     } 
     public function store(Request $request) {
-        //
+        print_r($request);
     }
 
     public function show($id) {
