@@ -81,10 +81,6 @@
                 event.preventDefault();
                 $('#enddate').focus();
             });
-            $("#enddate").datepicker({
-                format:'dd/mm/yyyy',
-                autoclose: true
-            });
             var d = new Date();
             var currDate = d.getDate();
             var currMonth = d.getMonth();
@@ -93,20 +89,19 @@
             $("#startdate").datepicker({                
                 todayBtn:  1,
                 autoclose: true,
-                format: 'dd/mm/yyyy',
             }).on('changeDate', function (selected) {
                 var minDate = new Date(selected.date.valueOf());
                 $('#enddate').datepicker('setStartDate', minDate);                
             });
             $('#startdate').datepicker('setDate', new Date(currYear, currMonth, 01));
             $("#enddate").datepicker({
-                autoclose: true
+                autoclose: true,
             }).on('changeDate', function (selected) {
                 var maxDate = new Date(selected.date.valueOf());
                 $('#startdate').datepicker('setEndDate', maxDate);
                 $('#enddate').datepicker('hide');
             });
-            $('#enddate').datepicker('setDate', new Date(currYear, currMonth, currDate ));
+            $('#enddate').datepicker('setDate', new Date(currYear, currMonth, currDate));
             /*** END OF START & END DATEPICKER SETUP ***/
             /*** Javascript validation after user clicks on the 'Run Report' button ***/
             $('#process').click(function(){
@@ -126,28 +121,12 @@
                 } else {
                     $('#endDateError').hide();
                 }
-                <?php if(Auth::user()->role_id==1 || Auth::user()->role_id==2 || Auth::user()->role_id==5) { ?>
                 if($('#suppliers').prop("checked") == false && $('#source').prop("checked") == false && $('#clients').prop("checked") == false && $('#campaign').prop("checked") == false){
-                    $('#statsError').text('Please select atleast one option').show();
-                }
-                else{
-                    $('#statsError').hide();
-                }
-                <?php } if(Auth::user()->role_id==3) { ?>
-                if($('#source').prop("checked") == false && $('#clients').prop("checked") == false && $('#campaign').prop("checked") == false){
-                    $('#statsError').text('Please select atleast one option').show();
-                }else {
-                    $('#statsError').hide();
-                }
-                <?php } if(Auth::user()->role_id==4){ 
-                ?>
-                if($('#suppliers').prop("checked") == false && $('#source').prop("checked") == false && $('#campaign').prop("checked") == false){
                     $('#statsError').text('Please select atleast one option').show();
                 } else {
                     $('#statsError').hide();
                     //$('#statistics').submit();           
                 }
-                <?php } ?>
                 if ( $('#startDateError').css('display') == 'none' && $('#endDateError').css('display') == 'none' && $('#statsError').css('display') == 'none' ){
                     $('#statistics').submit();
                 }

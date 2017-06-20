@@ -8,7 +8,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>@yield('title')</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <link rel="shortcut icon" href="{{ asset('images/favicon.png') }}" />        
+        <link rel="shortcut icon" href="{{ asset('images/favicon.png') }}" />
          <!-- Bootstrap Core CSS -->
         <link href="{{ asset('css/bootstrap.min.css') }}" rel='stylesheet' type='text/css' />
         <!-- Custom CSS -->
@@ -59,7 +59,7 @@
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                     {{ csrf_field() }}
                                 </form>
-                            </li>   
+                            </li>
                         </ul>
                     </li>
                 </ul>
