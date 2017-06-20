@@ -16,7 +16,6 @@
          <link href="{{ asset('css/build.css') }}" rel='stylesheet' type='text/css' />
         <!-- Graph CSS -->
         <link href="{{ asset('css/lines.css') }}" rel='stylesheet' type='text/css' />
-        <!-- <link href="{{ asset('css/font-awesome.css') }}" rel="stylesheet" />  -->
         <script src="https://use.fontawesome.com/2db0ca0da2.js"></script>
         <link href="{{ asset('css/jquery.dataTables.min.css') }}" rel="stylesheet" /> 
         <link href="{{ asset('css/jquery.dataTables_themeroller.css') }}" rel="stylesheet" /> 
@@ -153,7 +152,6 @@
         <script src="{{ asset('js/jquery.uploadfile.js') }}"></script>
         <script src="{{ asset('js/bootstrap-datepicker.js') }}"></script>
         <script src="{{ asset('js/bootstrap-datepicker.min.js') }}"></script>
-        <!-- <script src="{{ asset('js/app.js') }}"></script> -->
         <script type="text/javascript">
             jQuery(document).ready(function(){
                 jQuery.ajax({ 
