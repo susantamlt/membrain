@@ -11,6 +11,7 @@ Route::resource('statistics','StatisticsController');
 Route::resource('clients','ClientsController');
 Route::resource('campaign','CampaignController');
 Route::get('campaign/{site}/delete', ['as' => 'campaign.delete', 'uses' => 'CampaignController@destroy']);
+Route::post('campaign/getCampaignsByClient/','CampaignController@getCampaignsByClient');
 Route::resource('donotcalls','DonotcallsController');
 Route::resource('salaciouswords','SalaciouswordsController');
 Route::resource('emailblacklists','EmailblacklistsController');
@@ -33,3 +34,6 @@ Route::post('/home/password', 'HomeController@getPassword');
 Route::post('/clients/upload', 'ClientsController@upload');
 Route::post('processleadcsv/processcsv','ProcessleadcsvController@processcsv');
 Route::resource('processleadcsv','ProcessleadcsvController');
+Route::group(['prefix' => 'api/v1'], function(){
+	Route::resource('leadprocessing', 'Api\LeadProcessingController');
+});

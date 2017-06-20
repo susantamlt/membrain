@@ -34,6 +34,10 @@ class CampaignController extends Controller
     {
         $data = $request->all();
 
+        // echo "<pre>";
+        // print_r($data);
+        // echo "<pre>";exit;
+
         $campaign = new Campaign;
 
         $campaign->public_id = md5('MB'.time());
