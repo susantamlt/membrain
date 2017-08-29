@@ -1,10 +1,3 @@
-TRUNCATE `alerts`;
-TRUNCATE `dncr_history`;
-TRUNCATE `email_history`;
-TRUNCATE `fraud_detection`;
-TRUNCATE `lead_history`;
-TRUNCATE `phone_history`;
-TRUNCATE `rapport_phone_history`;
 
 INSERT INTO `email_history` (`id`, `email_address`, `is_valid`, `validation_date`) VALUES
 (1, 'asdsa@xcz.com', 1, '2016-11-01'),
@@ -15,7 +8,7 @@ INSERT INTO `email_history` (`id`, `email_address`, `is_valid`, `validation_date
 (6, 'asdsa4@xcz.com', 1, '2016-11-01'),
 (7, 'asdsa3@xcz.com', 1, '2016-11-01'),
 (8, 'asdsa2@xcz.com', 1, '2016-11-01'),
-(9, 'asdsa9@xcz.com', 1, '2017-06-01'),
+(9, 'asdsa2@xcz.com', 1, '2017-06-01'),
 (10, 'asdsa0@xcz.com', 1, '2017-06-01');
 
 INSERT INTO `dncr_history` (`id`, `country_code`, `phone_number`, `on_dncr`, `validation_date`) VALUES
@@ -31,16 +24,16 @@ INSERT INTO `dncr_history` (`id`, `country_code`, `phone_number`, `on_dncr`, `va
 (10, 'US', '1234567899', 1, '2016-11-01');
 
 INSERT INTO `lead_history` (`id`, `client_id`, `campaign_id`, `data`, `client_duplicate`, `delivered`) VALUES
-(1, 1, '6', 'khkhk', 1, '2016-01-09 16:39:40'),
-(2, 2, '9', 'khkhk1', 1, '2016-01-09 16:39:40'),
-(3, 3, '10', 'khkhk2', 1, '2016-01-09 16:39:40'),
-(4, 5, '11', 'khkhk3', 1, '2016-01-09 16:39:40'),
-(5, 8, '12', 'khkhk4', 1, '2016-01-09 16:39:40'),
-(6, 9, '16', 'khkhk5', 1, '2016-01-09 16:39:40'),
-(7, 10, '17', 'khkhk6', 1, '2016-01-09 16:39:40'),
-(8, 12, '20', 'khkhk7', 1, '2016-01-09 16:39:40'),
-(9, 13, '21', 'khkhk8', 1, '2017-06-13 16:39:40'),
-(10, 14, '24', 'khkhk9', 1, '2017-06-13 16:39:40');
+(1, 1, '2', 'khkhk', 1, '2016-01-09 16:39:40'),
+(2, 2, '2', 'khkhk', 1, '2016-01-09 16:39:40'),
+(3, 3, '2', 'khkhk', 1, '2016-01-09 16:39:40'),
+(4, 5, '2', 'khkhk', 1, '2016-01-09 16:39:40'),
+(5, 8, '2', 'khkhk', 1, '2016-01-09 16:39:40'),
+(6, 9, '2', 'khkhk', 1, '2016-01-09 16:39:40'),
+(7, 10, '2', 'khkhk', 1, '2016-01-09 16:39:40'),
+(8, 12, '2', 'khkhk', 1, '2016-01-09 16:39:40'),
+(9, 13, '2', 'khkhk', 1, '2017-06-13 16:39:40'),
+(10, 14, '2', 'khkhk', 1, '2017-06-13 16:39:40');
 
 INSERT INTO `rapport_phone_history` (`id`, `country_code`, `phone_number`, `status_code`, `validation_date`) VALUES
 (1, 'US', '7854123690', 'niovouh', '2016-12-01'),

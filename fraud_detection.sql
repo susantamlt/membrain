@@ -1,4 +1,3 @@
-TRUNCATE `fraud_detection`;
 INSERT INTO `fraud_detection` (`id`, `supplier_id`, `source`, `client_id`, `campaign_id`, `email_address`, `phone`, `first_name`, `last_name`, `postcode`, `received`) VALUES
 (1, 1, 'ss.csv', 1, '1', 'foo@bar.com', '0412341234', 'Freddie', 'Farkus', '2000', '2017-06-01 00:00:00'),
 (2, 1, 'ss.csv', 1, '1', 'fred@farkus.com', '0412341234', 'Fred', 'Farkus', '2010', '2017-06-01 00:00:00'),
